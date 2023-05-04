@@ -90,6 +90,15 @@
       <version>3.0.11.RELEASE</version>
     </dependency>
 
+<!--    Hibernate validator-->
+    <!-- https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator -->
+    <dependency>
+      <groupId>org.hibernate.validator</groupId>
+      <artifactId>hibernate-validator</artifactId>
+      <version>6.1.6.Final</version>
+    </dependency>
+
+
   </dependencies>
 
   <build>
