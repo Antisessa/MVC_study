@@ -22,7 +22,7 @@ public class PeopleController {
         this.personDAO = personDAO;
     }
 
-    @GetMapping("")
+    @GetMapping()
     public String index(Model model){
         model.addAttribute("people", personDAO.index());
         return "/people/index";

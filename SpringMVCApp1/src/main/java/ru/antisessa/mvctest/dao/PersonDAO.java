@@ -1,6 +1,7 @@
 package ru.antisessa.mvctest.dao;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -48,4 +49,53 @@ public class PersonDAO {
         jdbcTemplate.update("DELETE FROM Person WHERE id=?", id);
     }
 
+    ///////////////////
+    //Тестируем производительность BatchUpdate
+    ///////////////////
+
+    public void testMultipleUpdate() {
+        long before = System.currentTimeMillis();
+
+        List<Person> people = create1000();
+        for (Person person : people) {
+            jdbcTemplate.update("INSERT INTO Person VALUES(?, ?, ?, ?)",
+                    person.getId(), person.getName(), person.getAge(), person.getEmail());
+        }
+
+        long after = System.currentTimeMillis();
+        System.out.println("Multiple update spent " + (after - before) + " ms");
+    }
+
+    public void testBatchUpdate(){
+        long before = System.currentTimeMillis();
+
+        List<Person> people = create1000();
+
+        jdbcTemplate.batchUpdate("INSERT INTO Person VALUES(?, ?, ?, ?)",
+                new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement preparedStatement, int i) throws SQLException {
+                preparedStatement.setInt(1, people.get(i).getId());
+                preparedStatement.setString(2, people.get(i).getName());
+                preparedStatement.setInt(3, people.get(i).getAge());
+                preparedStatement.setString(4, people.get(i).getEmail());
+            }
+
+            @Override
+            public int getBatchSize() {
+                return people.size();
+            }
+        });
+
+        long after = System.currentTimeMillis();
+        System.out.println("Batch update spent " + (after - before) + " ms");
+    }
+
+    private List<Person> create1000(){
+        List<Person> people = new ArrayList<>();
+        for (int i = 0; i < 1000; i++) {
+            people.add(new Person(i, "Name" + i, 30, "Name" + i + "@mail.ru"));
+        }
+        return people;
+    }
 }

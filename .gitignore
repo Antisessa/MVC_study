@@ -1,2 +1,7 @@
 /target/
 /.idea/
+/SpringMVCApp1/.idea/
+/SpringMVCApp1/src/main/java/ru/antisessa/mvctest/controllers/TestDAO.java
+/SpringMVCApp1/src/main/test/TestDAO.java
+/SpringMVCApp1/src/main/test/TestDAO.java
+/SpringMVCApp1/src/main/java/ru/antisessa/mvctest/dao/TestDAO.java
