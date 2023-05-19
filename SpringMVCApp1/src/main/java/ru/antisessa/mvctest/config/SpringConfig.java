@@ -25,8 +25,6 @@ import java.util.Objects;
 @PropertySource("classpath:/database.properties")
 public class SpringConfig implements WebMvcConfigurer {
     public final ApplicationContext applicationContext;
-
-    @Autowired
     public final Environment environment;
 
     @Autowired
@@ -64,9 +62,9 @@ public class SpringConfig implements WebMvcConfigurer {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
 
             dataSource.setDriverClassName(Objects.requireNonNull(environment.getProperty("driver")));
-            dataSource.setUrl(Objects.requireNonNull(environment.getProperty("url")));
-            dataSource.setUsername(Objects.requireNonNull(environment.getProperty("db_username")));
-            dataSource.setPassword(Objects.requireNonNull(environment.getProperty("db_password")));
+            dataSource.setUrl(environment.getProperty("url"));
+            dataSource.setUsername(environment.getProperty("db_username"));
+            dataSource.setPassword(environment.getProperty("db_password"));
         return dataSource;
     }
 

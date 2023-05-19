@@ -36,7 +36,7 @@ public class PersonDAO {
     }
 
     public void save(Person person) {
-        jdbcTemplate.update("INSERT INTO Person VALUES(1, ?, ?, ?)",
+        jdbcTemplate.update("INSERT INTO Person(name, age, email) VALUES(?, ?, ?)",
                 person.getName(), person.getAge(), person.getEmail());
     }
 
@@ -49,46 +49,21 @@ public class PersonDAO {
         jdbcTemplate.update("DELETE FROM Person WHERE id=?", id);
     }
 
-    ///////////////////
-    //Тестируем производительность BatchUpdate
-    ///////////////////
-
-    public void testMultipleUpdate() {
-        long before = System.currentTimeMillis();
-
+    public void BatchUpdate(){
         List<Person> people = create1000();
-        for (Person person : people) {
-            jdbcTemplate.update("INSERT INTO Person VALUES(?, ?, ?, ?)",
-                    person.getId(), person.getName(), person.getAge(), person.getEmail());
-        }
-
-        long after = System.currentTimeMillis();
-        System.out.println("Multiple update spent " + (after - before) + " ms");
-    }
-
-    public void testBatchUpdate(){
-        long before = System.currentTimeMillis();
-
-        List<Person> people = create1000();
-
-        jdbcTemplate.batchUpdate("INSERT INTO Person VALUES(?, ?, ?, ?)",
+        jdbcTemplate.batchUpdate("INSERT INTO Person(name, age, email) VALUES(?, ?, ?)",
                 new BatchPreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement preparedStatement, int i) throws SQLException {
-                preparedStatement.setInt(1, people.get(i).getId());
-                preparedStatement.setString(2, people.get(i).getName());
-                preparedStatement.setInt(3, people.get(i).getAge());
-                preparedStatement.setString(4, people.get(i).getEmail());
+                preparedStatement.setString(1, people.get(i).getName());
+                preparedStatement.setInt(2, people.get(i).getAge());
+                preparedStatement.setString(3, people.get(i).getEmail());
             }
-
             @Override
             public int getBatchSize() {
                 return people.size();
             }
         });
-
-        long after = System.currentTimeMillis();
-        System.out.println("Batch update spent " + (after - before) + " ms");
     }
 
     private List<Person> create1000(){

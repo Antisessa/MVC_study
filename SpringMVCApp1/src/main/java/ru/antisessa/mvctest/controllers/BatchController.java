@@ -5,10 +5,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import ru.antisessa.mvctest.dao.PersonDAO;
-import ru.antisessa.mvctest.models.Person;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Controller
 @RequestMapping("/test-batch-update")
@@ -29,15 +25,9 @@ public class BatchController {
         return "batch/index";
     }
 
-    @GetMapping("/without")
-    public String withoutBatch(){
-        personDAO.testMultipleUpdate();
-        return "redirect:/people";
-        }
-
-    @GetMapping("/with")
+    @GetMapping("/batchUpdate")
     public String withBatch(){
-        personDAO.testBatchUpdate();
+        personDAO.BatchUpdate();
         return "redirect:/people";
     }
 }
