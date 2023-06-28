@@ -7,9 +7,14 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.antisessa.mvctest.models.Person;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Component
 public class PersonDAO {
@@ -26,13 +31,21 @@ public class PersonDAO {
     }
 
     public Person show(int id){
-        return jdbcTemplate.query("SELECT * FROM Person WHERE id=?", new Object[]{id}, new BeanPropertyRowMapper<>(Person.class))
-                .stream().findAny().orElse(null);
+        return jdbcTemplate.query("SELECT * FROM Person WHERE id=?", new Object[]{id},
+                        new BeanPropertyRowMapper<>(Person.class)).stream().findAny().orElse(null);
         //Лямбда выражение осуществляет поиск соответствий, и либо выводит объект класса Person, либо если такого id нет - null,
         //метод findAny возвращает Optional<>, поэтому он подходит под возвращаемый тип метода
 
         //Второй аргумент передает id для внутреннего PreparedStatement который неявно использует JdbcTemplate,
-        //этот id будет поставлен за место ? в SQL запрос
+        //этот id будет поставлен вместо ? в SQL запрос
+    }
+
+    public Optional<Person> show(String email) {
+        return jdbcTemplate.query("SELECT * FROM Person WHERE email=?", new Object[]{email},
+                new BeanPropertyRowMapper<>(Person.class)).stream().findAny();
+        //Метод отображения человека по почте, в качестве аргумента принимающий значение email, и подставляющий
+        //его в PreparedStatement вместо ?, лямбда выражение осуществляет поиск
+        //и возвращает Optional<> - подходящего человека или null
     }
 
     public void save(Person person) {
@@ -50,7 +63,7 @@ public class PersonDAO {
     }
 
     public void BatchUpdate(){
-        List<Person> people = create1000();
+        List<Person> people = create100();
         jdbcTemplate.batchUpdate("INSERT INTO Person(name, age, email) VALUES(?, ?, ?)",
                 new BatchPreparedStatementSetter() {
             @Override
@@ -66,10 +79,26 @@ public class PersonDAO {
         });
     }
 
-    private List<Person> create1000(){
+    //блок метода для заполнения БД ста случайными записями
+    private List<Person> create100(){
         List<Person> people = new ArrayList<>();
-        for (int i = 0; i < 1000; i++) {
-            people.add(new Person(i, "Name" + i, 30, "Name" + i + "@mail.ru"));
+        File nameFile = new File("D:\\Java Prod\\actual\\MVC_study\\SpringMVCApp1\\src\\main\\resources\\NamesWithNumber.txt");
+        File mailFile = new File("D:\\Java Prod\\actual\\MVC_study\\SpringMVCApp1\\src\\main\\resources\\MailWithNumbers.txt");
+        try (InputStream inputNameStream = new FileInputStream(nameFile);
+             InputStream inputMailStream = new FileInputStream(mailFile)) {
+
+            Properties nameProperties = new Properties();
+            nameProperties.load(inputNameStream);
+
+            Properties mailProperties = new Properties();
+            mailProperties.load(inputMailStream);
+
+            Random random = new Random();
+            for (int i = 1; i < 101; i++) {
+                people.add(new Person(i, nameProperties.getProperty("" + i), random.nextInt(85) + 1, nameProperties.getProperty("" + i) + mailProperties.getProperty(""+(random.nextInt(11)))));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return people;
     }

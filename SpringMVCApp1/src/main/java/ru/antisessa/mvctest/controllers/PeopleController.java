@@ -7,6 +7,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.antisessa.mvctest.dao.PersonDAO;
 import ru.antisessa.mvctest.models.Person;
+import ru.antisessa.mvctest.util.PersonValidator;
 
 import javax.validation.Valid;
 
@@ -14,12 +15,13 @@ import javax.validation.Valid;
 @RequestMapping("/people")
 public class PeopleController {
 
-    final
-    PersonDAO personDAO;
+    final PersonDAO personDAO;
+    private final PersonValidator personValidator;
 
     @Autowired
-    public PeopleController(PersonDAO personDAO) {
+    public PeopleController(PersonDAO personDAO, PersonValidator personValidator) {
         this.personDAO = personDAO;
+        this.personValidator = personValidator;
     }
 
     @GetMapping()
@@ -42,6 +44,11 @@ public class PeopleController {
     @PostMapping()
     public String create(@ModelAttribute("person") @Valid Person person,
                          BindingResult bindingResult) {
+        personValidator.validate(person, bindingResult);
+        //Здесь мы передаем значения для валидатора:
+        //объект person пришедший из формы и стек ошибок bindingResult который
+        //собирает все ошибки(от аннотации Valid тоже) для их отображения на странице
+
         if (bindingResult.hasErrors())
             return "people/new";
         
@@ -58,6 +65,8 @@ public class PeopleController {
     @PatchMapping("/{id}")
     public String update(@ModelAttribute("person") @Valid Person person,
                          BindingResult bindingResult, @PathVariable("id") int id){
+        personValidator.validate(person, bindingResult);
+        //для понимания смотри комментарий под create()
 
         if (bindingResult.hasErrors())
             return "people/edit";
