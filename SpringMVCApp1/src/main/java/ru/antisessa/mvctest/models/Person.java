@@ -5,10 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -27,4 +24,11 @@ public class Person {
     @NotEmpty(message = "Email should not be empty")
     @Email(message = "Email should be valid")
     private String email;
+
+    //Страна, Город, Индекс (6 цифр)
+    //Russia, Moscow, 123456
+    //https://www.rexegg.com/regex-quickstart.html Шпаргалка для регулярок
+
+    @Pattern(regexp = "[A-Z]\\w+, [A-Z]\\w+, \\d{6}", message = "Your address should be in this format: Country, City, Index(6 digits)")
+    private String address;
 }

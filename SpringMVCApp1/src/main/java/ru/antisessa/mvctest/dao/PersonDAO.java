@@ -49,13 +49,13 @@ public class PersonDAO {
     }
 
     public void save(Person person) {
-        jdbcTemplate.update("INSERT INTO Person(name, age, email) VALUES(?, ?, ?)",
-                person.getName(), person.getAge(), person.getEmail());
+        jdbcTemplate.update("INSERT INTO Person(name, age, email, address) VALUES(?, ?, ?, ?)",
+                person.getName(), person.getAge(), person.getEmail(), person.getAddress());
     }
 
     public void update(int id, Person updatePerson){
-        jdbcTemplate.update("UPDATE Person SET name=?, age=?, email=? WHERE id=?",
-                updatePerson.getName(), updatePerson.getAge(), updatePerson.getEmail(), id);
+        jdbcTemplate.update("UPDATE Person SET name=?, age=?, email=?, address=? WHERE id=?",
+                updatePerson.getName(), updatePerson.getAge(), updatePerson.getEmail(), updatePerson.getAddress(), id);
     }
 
     public void delete(int id) {
@@ -95,7 +95,7 @@ public class PersonDAO {
 
             Random random = new Random();
             for (int i = 1; i < 101; i++) {
-                people.add(new Person(i, nameProperties.getProperty("" + i), random.nextInt(85) + 1, nameProperties.getProperty("" + i) + mailProperties.getProperty(""+(random.nextInt(11)))));
+                people.add(new Person(i, nameProperties.getProperty("" + i), random.nextInt(85) + 1, nameProperties.getProperty("" + i) + mailProperties.getProperty(""+(random.nextInt(11))), "SameAddress"));
             }
         } catch (IOException e) {
             e.printStackTrace();
